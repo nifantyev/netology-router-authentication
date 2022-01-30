@@ -1,55 +1,19 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import useAuthFetch from '../hooks/useAuthFetch';
 import AuthContext from '../contexts/AuthContext';
 import NewsItem from '../components/NewsItem';
 import Logout from '../components/Logout';
 
 const SingleNews = () => {
   const { id } = useParams();
-  const { token, handleLogout } = useContext(AuthContext);
-  const [newsItem, setNewsItem] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-
+  const { handleLogout } = useContext(AuthContext);
   const navigate = useNavigate();
-
-  useEffect(() => {
-    if (token) {
-      const fetchNewsItem = async () => {
-        try {
-          setError(null);
-          setLoading(true);
-          const response = await fetch(
-            `${process.env.REACT_APP_BASE_API_URL}/private/news/${id}`,
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            }
-          );
-          if (response.ok) {
-            const json = await response.json();
-            setNewsItem(json);
-            setLoading(false);
-          } else {
-            if (response.status === 401) {
-              handleLogout();
-              navigate('/');
-            } else {
-              setLoading(false);
-            }
-          }
-        } catch (e) {
-          setError(e.message);
-          setLoading(false);
-        }
-      };
-      fetchNewsItem();
-    } else {
-      handleLogout();
-      navigate('/');
-    }
-  }, [id, token, handleLogout, navigate]);
+  const {
+    loading,
+    error,
+    data: newsItem,
+  } = useAuthFetch(`${process.env.REACT_APP_BASE_API_URL}/private/news/${id}`);
 
   const onLogout = () => {
     handleLogout();
@@ -58,6 +22,7 @@ const SingleNews = () => {
 
   return (
     <>
+      <Logout onLogout={onLogout} />
       {loading && (
         <div className="container">
           <div className="spinner-border" role="status">
@@ -66,38 +31,32 @@ const SingleNews = () => {
         </div>
       )}
       {!loading && !newsItem && (
-        <>
-          <Logout onLogout={onLogout} />
-          <div className="container">
-            <div className="row">
-              <div className="col">
-                <h1>404 Not Found</h1>
-              </div>
+        <div className="container">
+          <div className="row">
+            <div className="col">
+              <h1>404 Not Found</h1>
             </div>
           </div>
-        </>
+        </div>
       )}
-      {token && newsItem && (
-        <>
-          <Logout onLogout={onLogout} />
-          <div className="container">
-            {error && (
-              <div class="row">
-                <div class="col">{error}</div>
-              </div>
-            )}
-            <div className="row">
-              <div className="col-4 offset-4">
-                <NewsItem
-                  id={newsItem.id}
-                  src={newsItem.image}
-                  title={newsItem.title}
-                  content={newsItem.content}
-                />
-              </div>
+      {newsItem && (
+        <div className="container">
+          {error && (
+            <div class="row">
+              <div class="col">{error}</div>
+            </div>
+          )}
+          <div className="row">
+            <div className="col-4 offset-4">
+              <NewsItem
+                id={newsItem.id}
+                src={newsItem.image}
+                title={newsItem.title}
+                content={newsItem.content}
+              />
             </div>
           </div>
-        </>
+        </div>
       )}
     </>
   );
