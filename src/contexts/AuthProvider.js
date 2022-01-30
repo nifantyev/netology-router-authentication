@@ -1,63 +1,55 @@
-import { useState } from 'react';
 import useStorage from '../hooks/useStorage';
 import AuthContext from './AuthContext';
 
 const AuthProvider = (props) => {
-  const [error, setError] = useState(null);
   const [token, setToken] = useStorage(localStorage, 'token');
   const [profile, setProfile] = useStorage(localStorage, 'profile', true);
 
   const handleLogin = async (login, password) => {
-    try {
-      setError(null);
-      const authResponse = await fetch(
-        `${process.env.REACT_APP_BASE_API_URL}/auth`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            login: login,
-            password: password,
-          }),
-        }
-      );
-      if (!authResponse.ok) {
-        if (authResponse.status === 400) {
-          const { message } = await authResponse.json();
-          throw new Error(message);
-        }
-        throw new Error('Auth failed');
+    const authResponse = await fetch(
+      `${process.env.REACT_APP_BASE_API_URL}/auth`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          login: login,
+          password: password,
+        }),
       }
-      const { token } = await authResponse.json();
-      setToken(token);
-
-      const profileResponse = await fetch(
-        `${process.env.REACT_APP_BASE_API_URL}/private/me`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      if (!profileResponse.ok) {
-        throw new Error(
-          `${profileResponse.status} ${profileResponse.statusText}`
-        );
+    );
+    if (!authResponse.ok) {
+      if (authResponse.status === 400) {
+        const { message } = await authResponse.json();
+        throw new Error(message);
       }
-
-      const profile = await profileResponse.json();
-      setProfile(profile);
-    } catch (e) {
-      setError(e.message);
+      throw new Error('Auth failed');
     }
+    const { token } = await authResponse.json();
+    setToken(token);
+
+    const profileResponse = await fetch(
+      `${process.env.REACT_APP_BASE_API_URL}/private/me`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    if (!profileResponse.ok) {
+      throw new Error(
+        `${profileResponse.status} ${profileResponse.statusText}`
+      );
+    }
+
+    const profile = await profileResponse.json();
+    setProfile(profile);
   };
 
   const handleLogout = () => {
     setToken(null);
     setProfile(null);
-    setError(null);
   };
 
   return (
@@ -67,7 +59,6 @@ const AuthProvider = (props) => {
         handleLogout,
         token,
         profile,
-        error,
       }}
     >
       {props.children}
