@@ -35,6 +35,8 @@ const SingleNews = () => {
             if (response.status === 401) {
               handleLogout();
               navigate('/');
+            } else {
+              setLoading(false);
             }
           }
         } catch (e) {
@@ -62,6 +64,18 @@ const SingleNews = () => {
             <span className="visually-hidden">Loading...</span>
           </div>
         </div>
+      )}
+      {!loading && !newsItem && (
+        <>
+          <Logout onLogout={onLogout} />
+          <div className="container">
+            <div className="row">
+              <div className="col">
+                <h1>404 Not Found</h1>
+              </div>
+            </div>
+          </div>
+        </>
       )}
       {token && newsItem && (
         <>
