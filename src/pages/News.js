@@ -2,18 +2,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AuthContext from '../contexts/AuthContext';
 import Logout from '../components/Logout';
-
-const NewsItem = ({ src, title, content }) => {
-  return (
-    <div className="card mb-4">
-      <img src={src} className="card-img-top" alt={title} />
-      <div className="card-body">
-        <h5 className="card-title">{title}</h5>
-        <p className="card-text">{content}</p>
-      </div>
-    </div>
-  );
-};
+import NewsItem from '../components/NewsItem';
 
 const News = () => {
   const { token, handleLogout } = useContext(AuthContext);
@@ -85,7 +74,13 @@ const News = () => {
             <div className="row">
               {news.map((o) => (
                 <div key={o.id} className="col-4">
-                  <NewsItem src={o.image} title={o.title} content={o.content} />
+                  <NewsItem
+                    id={o.id}
+                    src={o.image}
+                    title={o.title}
+                    content={o.content}
+                    onClick={(id) => console.log(id)}
+                  />
                 </div>
               ))}
             </div>
