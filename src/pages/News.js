@@ -79,7 +79,7 @@ const News = () => {
                     src={o.image}
                     title={o.title}
                     content={o.content}
-                    onClick={(id) => console.log(id)}
+                    onClick={(id) => navigate(`/news/${id}`)}
                   />
                 </div>
               ))}
