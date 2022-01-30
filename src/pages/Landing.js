@@ -1,12 +1,12 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import LoginForm from '../components/LoginForm';
 import AuthContext from '../contexts/AuthContext';
 
 const Landing = () => {
   const navigate = useNavigate();
-  const { handleLogin } = useContext(AuthContext);
-  const onLogin = (login, password) => {
+  const { token, profile, handleLogin } = useContext(AuthContext);
+  const onLogin = async (login, password) => {
     handleLogin(login, password)
       .then(() => {
         navigate('/news');
@@ -15,6 +15,12 @@ const Landing = () => {
         window.alert(e.message);
       });
   };
+
+  useEffect(() => {
+    if (token && profile) {
+      navigate('/news');
+    }
+  }, [token, profile, navigate]);
 
   return (
     <>
