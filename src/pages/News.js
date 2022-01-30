@@ -34,6 +34,8 @@ const News = () => {
             if (response.status === 401) {
               handleLogout();
               navigate('/');
+            } else {
+              setLoading(false);
             }
           }
         } catch (e) {
