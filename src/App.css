@@ -4,3 +4,7 @@
   padding-left: 3rem;
   background-color: #e8ebee;
 }
+
+.clickable {
+  cursor: pointer;
+}
